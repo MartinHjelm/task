@@ -1,0 +1,7 @@
+mkdir build
+cd build
+#cmake .. -DOPENNI2_LIBRARY=$OPENNI2_REDIST -DOPENNI2_INCLUDE_DIRS=$OPENNI2_INCLUDE_DIRS
+cmake --std=env .. -DOPENNI2_LIBRARY=$OPENNI2_REDIST -DOPENNI2_INCLUDE_DIR=$OPENNI2_INCLUDE
+make -j 4 install
+cd ..
+rm -r build

@@ -1,0 +1,62 @@
+PROJECT(TaskConstraints)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+
+IF(APPLE)
+  SET(HOME /Users/martinhjelm)
+  SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++ -Wno-unused-variable -Wnullability-completeness -Wno-deprecated-declarations -Wno-inconsistent-missing-override -march=native")
+  SET(EXECUTABLE_FLAG MACOSX_BUNDLE)
+  SET(OpenCV_DIR "/usr/local/Cellar/opencv/4.1.1_2/lib/cmake/opencv4")
+ELSE(APPLE)
+  SET(HOME /home/martin)
+  SET(CMAKE_CXX_FLAGS "-std=c++11 -O4 -fopenmp -fPIC -Wno-unused-variable -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-function -Wno-comment -Wno-unused-parameter -march=native")
+  SET (CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH} /home/martin/.linuxbrew/Cellar/pcl/1.8.1/share/)
+ENDIF(APPLE)
+
+set(CMAKE_BUILD_TYPE Debug)
+
+#SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O4")
+
+FIND_PACKAGE(PCL 1.8 REQUIRED)
+FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(Boost COMPONENTS random system filesystem program_options thread date_time iostreams serialization chrono REQUIRED)
+FIND_PACKAGE(GSL REQUIRED)
+FIND_PACKAGE(Threads REQUIRED)
+#FIND_PACKAGE(FLANN REQUIRED)
+
+SET(MYINCS ${HOME}/Libs/include/helperlibs )
+SET(MYLIBDIR ${HOME}/Libs/lib)
+SET(MYLIBS ${MYLIBDIR}/libhelperlibs.a )
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${MYINCS} ${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${GSL_INCLUDE_DIRS} )
+ADD_DEFINITIONS(${PCL_DEFINITIONS})
+
+# Add subdirectories for the different modules.
+ADD_SUBDIRECTORY (ransac)
+ADD_SUBDIRECTORY (features)
+ADD_SUBDIRECTORY (model)
+
+#ADD_DEFINITIONS("-DVL_DISABLE_AVX")
+
+ADD_EXECUTABLE(viewfeatures viewfeatures.cpp)
+ADD_EXECUTABLE(viewgrasp viewgrasp.cpp)
+ADD_EXECUTABLE(segment_files segment_files.cpp)
+ADD_EXECUTABLE(viewgraspfactor viewgraspfactor.cpp)
+ADD_EXECUTABLE(collect_data collect_data.cpp )
+ADD_EXECUTABLE(collect_data_full collect_data_full.cpp )
+# ADD_EXECUTABLE(viewsymmetry viewsymmetry.cpp )
+ADD_EXECUTABLE(extract_object_features extract_object_features.cpp )
+ADD_EXECUTABLE(viewaffordanceweights viewaffordanceweights.cpp )
+ADD_EXECUTABLE(viewaffordanceweights_sum viewaffordanceweights_sum.cpp )
+ADD_EXECUTABLE(viewaffordanceweights_sum_all viewaffordanceweights_sum_all.cpp )
+
+#TARGET_LINK_LIBRARIES(viewsymmetry LINK_PUBLIC ${LIBS} )
+TARGET_LINK_LIBRARIES(viewfeatures LINK_PUBLIC TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+TARGET_LINK_LIBRARIES(viewgrasp LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(segment_files LINK_PUBLIC TC_Ransac TC_Features TC_Model  ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(viewgraspfactor LINK_PUBLIC TC_Ransac TC_Features TC_Model  ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(collect_data LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(collect_data_full LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(extract_object_features LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(viewaffordanceweights LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(viewaffordanceweights_sum LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES(viewaffordanceweights_sum_all LINK_PUBLIC TC_Ransac TC_Features TC_Model ${MYLIBS} ${OpenCV_LIBS} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
